@@ -1,0 +1,344 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout title="التوقيع الإلكتروني">
+    <section class="py-10">
+        <h1 class="mb-4 text-3xl font-bold">أداة التوقيع الإلكتروني على PDF</h1>
+        <p class="mb-8 text-lg text-white/70">
+            ارفع ملف PDF، ارسم توقيعك، ثم اضغط على المكان المناسب في الصفحة لإضافة التوقيع وحفظ الملف.
+        </p>
+
+        <div class="grid gap-6 mb-6 lg:grid-cols-[320px_1fr]">
+            <aside class="flex flex-col gap-6 p-5 bg-white/5 rounded-xl border border-white/10 h-fit">
+                <div>
+                    <label class="block mb-2 font-semibold">1. ملف PDF</label>
+                    <input
+                        id="pdf-input"
+                        type="file"
+                        accept="application/pdf"
+                        class="block w-full text-sm file:ml-3 file:py-2 file:px-4 file:rounded-md file:border-0 file:bg-primary file:text-white file:cursor-pointer"
+                    />
+                </div>
+
+                <div>
+                    <label class="block mb-2 font-semibold">2. ارسم التوقيع</label>
+                    <canvas
+                        id="sig-pad"
+                        width="300"
+                        height="150"
+                        class="bg-white rounded-md cursor-crosshair touch-none w-full"></canvas>
+                    <div class="flex gap-2 mt-2">
+                        <button
+                            id="sig-clear"
+                            type="button"
+                            class="px-3 py-1.5 text-sm bg-white/10 hover:bg-white/20 rounded-md"
+                        >
+                            مسح
+                        </button>
+                        <label
+                            class="px-3 py-1.5 text-sm bg-white/10 hover:bg-white/20 rounded-md cursor-pointer"
+                        >
+                            رفع صورة توقيع
+                            <input id="sig-image" type="file" accept="image/*" class="hidden" />
+                        </label>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block mb-2 font-semibold">3. حجم التوقيع</label>
+                    <input
+                        id="sig-size"
+                        type="range"
+                        min="60"
+                        max="300"
+                        value="140"
+                        class="w-full"
+                    />
+                    <p class="text-xs text-white/60 mt-1">
+                        اضغط على الموضع المطلوب في الـ PDF لإضافة التوقيع.
+                    </p>
+                </div>
+
+                <div class="flex flex-col gap-2">
+                    <button
+                        id="undo-btn"
+                        type="button"
+                        disabled
+                        class="px-4 py-2 bg-white/10 hover:bg-white/20 disabled:opacity-40 disabled:cursor-not-allowed rounded-md"
+                    >
+                        تراجع عن آخر توقيع
+                    </button>
+                    <button
+                        id="download-btn"
+                        type="button"
+                        disabled
+                        class="px-4 py-2 bg-primary hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed rounded-md font-semibold"
+                    >
+                        حفظ PDF موقّع
+                    </button>
+                </div>
+
+                <p id="status" class="text-sm text-white/70 min-h-5"></p>
+            </aside>
+
+            <div
+                id="pdf-container"
+                class="flex flex-col items-center gap-6 p-4 bg-white/5 rounded-xl border border-white/10 min-h-[400px]"
+            >
+                <p class="text-white/60 my-auto">لم يتم تحميل أي ملف بعد.</p>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        // @ts-nocheck
+        import * as pdfjsLib from 'https://cdn.jsdelivr.net/npm/pdfjs-dist@4.7.76/build/pdf.min.mjs';
+        import { PDFDocument } from 'https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/+esm';
+
+        pdfjsLib.GlobalWorkerOptions.workerSrc =
+            'https://cdn.jsdelivr.net/npm/pdfjs-dist@4.7.76/build/pdf.worker.min.mjs';
+
+        const $ = (id: string) => document.getElementById(id)!;
+        const pdfInput = $('pdf-input') as HTMLInputElement;
+        const sigPad = $('sig-pad') as HTMLCanvasElement;
+        const sigClear = $('sig-clear') as HTMLButtonElement;
+        const sigImage = $('sig-image') as HTMLInputElement;
+        const sigSize = $('sig-size') as HTMLInputElement;
+        const undoBtn = $('undo-btn') as HTMLButtonElement;
+        const downloadBtn = $('download-btn') as HTMLButtonElement;
+        const status = $('status') as HTMLElement;
+        const pdfContainer = $('pdf-container') as HTMLElement;
+
+        const RENDER_SCALE = 1.5;
+
+        let pdfBytes: Uint8Array | null = null;
+        let signaturePngDataUrl: string | null = null;
+        // placements per page index: { x, y, sizePx, pageWidth, pageHeight }
+        const placements: Record<number, Array<any>> = {};
+        const placementOrder: Array<{ page: number; index: number }> = [];
+
+        // ---------- Signature pad ----------
+        const sCtx = sigPad.getContext('2d')!;
+        sCtx.lineWidth = 2.5;
+        sCtx.lineCap = 'round';
+        sCtx.strokeStyle = '#111';
+        let drawing = false;
+        let hasStroke = false;
+
+        function padPos(e: PointerEvent) {
+            const r = sigPad.getBoundingClientRect();
+            return {
+                x: ((e.clientX - r.left) * sigPad.width) / r.width,
+                y: ((e.clientY - r.top) * sigPad.height) / r.height,
+            };
+        }
+        sigPad.addEventListener('pointerdown', (e) => {
+            drawing = true;
+            hasStroke = true;
+            const p = padPos(e);
+            sCtx.beginPath();
+            sCtx.moveTo(p.x, p.y);
+            sigPad.setPointerCapture(e.pointerId);
+        });
+        sigPad.addEventListener('pointermove', (e) => {
+            if (!drawing) return;
+            const p = padPos(e);
+            sCtx.lineTo(p.x, p.y);
+            sCtx.stroke();
+        });
+        sigPad.addEventListener('pointerup', () => {
+            drawing = false;
+            captureSignatureFromPad();
+        });
+        sigPad.addEventListener('pointerleave', () => (drawing = false));
+
+        sigClear.addEventListener('click', () => {
+            sCtx.clearRect(0, 0, sigPad.width, sigPad.height);
+            hasStroke = false;
+            signaturePngDataUrl = null;
+            setStatus('تم مسح التوقيع.');
+        });
+
+        function captureSignatureFromPad() {
+            if (!hasStroke) return;
+            // export canvas with transparent background but black ink
+            signaturePngDataUrl = sigPad.toDataURL('image/png');
+        }
+
+        sigImage.addEventListener('change', async () => {
+            const f = sigImage.files?.[0];
+            if (!f) return;
+            const url = URL.createObjectURL(f);
+            const img = new Image();
+            img.onload = () => {
+                sCtx.clearRect(0, 0, sigPad.width, sigPad.height);
+                const ratio = Math.min(sigPad.width / img.width, sigPad.height / img.height);
+                const w = img.width * ratio;
+                const h = img.height * ratio;
+                sCtx.drawImage(img, (sigPad.width - w) / 2, (sigPad.height - h) / 2, w, h);
+                hasStroke = true;
+                signaturePngDataUrl = sigPad.toDataURL('image/png');
+                URL.revokeObjectURL(url);
+                setStatus('تم تحميل صورة التوقيع.');
+            };
+            img.src = url;
+        });
+
+        // ---------- PDF rendering ----------
+        pdfInput.addEventListener('change', async () => {
+            const file = pdfInput.files?.[0];
+            if (!file) return;
+            setStatus('جاري قراءة الملف...');
+            const buf = new Uint8Array(await file.arrayBuffer());
+            pdfBytes = buf;
+            for (const k of Object.keys(placements)) delete placements[+k];
+            placementOrder.length = 0;
+            await renderPdf(buf);
+            downloadBtn.disabled = false;
+            setStatus('اضغط على الـ PDF لوضع التوقيع.');
+        });
+
+        async function renderPdf(bytes: Uint8Array) {
+            pdfContainer.innerHTML = '';
+            const pdf = await pdfjsLib.getDocument({ data: bytes.slice() }).promise;
+            for (let i = 1; i <= pdf.numPages; i++) {
+                const page = await pdf.getPage(i);
+                const viewport = page.getViewport({ scale: RENDER_SCALE });
+                const wrap = document.createElement('div');
+                wrap.className = 'relative shadow-lg';
+                wrap.style.width = viewport.width + 'px';
+                wrap.style.height = viewport.height + 'px';
+                wrap.dataset.page = String(i - 1);
+                wrap.dataset.w = String(viewport.width);
+                wrap.dataset.h = String(viewport.height);
+
+                const canvas = document.createElement('canvas');
+                canvas.width = viewport.width;
+                canvas.height = viewport.height;
+                canvas.className = 'block';
+                wrap.appendChild(canvas);
+
+                const overlay = document.createElement('div');
+                overlay.className = 'absolute inset-0 cursor-crosshair';
+                overlay.dataset.overlay = '1';
+                wrap.appendChild(overlay);
+
+                pdfContainer.appendChild(wrap);
+
+                await page.render({ canvasContext: canvas.getContext('2d')!, viewport }).promise;
+
+                overlay.addEventListener('click', (e) => onPageClick(e, i - 1, viewport.width, viewport.height));
+            }
+        }
+
+        function onPageClick(e: MouseEvent, pageIndex: number, pageW: number, pageH: number) {
+            if (!signaturePngDataUrl) {
+                setStatus('ارسم التوقيع أولاً.');
+                return;
+            }
+            const target = e.currentTarget as HTMLElement;
+            const r = target.getBoundingClientRect();
+            const x = e.clientX - r.left;
+            const y = e.clientY - r.top;
+            const sizePx = parseInt(sigSize.value, 10);
+
+            const wrap = target.parentElement!;
+            const placement = { x, y, sizePx, pageW, pageH };
+            (placements[pageIndex] ||= []).push(placement);
+            placementOrder.push({ page: pageIndex, index: placements[pageIndex].length - 1 });
+            undoBtn.disabled = false;
+
+            // visual marker
+            const img = document.createElement('img');
+            img.src = signaturePngDataUrl;
+            img.className = 'absolute pointer-events-none';
+            const ratio = sigPad.height / sigPad.width;
+            const w = sizePx;
+            const h = sizePx * ratio;
+            img.style.left = x - w / 2 + 'px';
+            img.style.top = y - h / 2 + 'px';
+            img.style.width = w + 'px';
+            img.style.height = h + 'px';
+            (placement as any).el = img;
+            wrap.appendChild(img);
+            setStatus(`عدد التواقيع: ${placementOrder.length}`);
+        }
+
+        undoBtn.addEventListener('click', () => {
+            const last = placementOrder.pop();
+            if (!last) return;
+            const arr = placements[last.page];
+            const item = arr[last.index];
+            if (item?.el) item.el.remove();
+            arr.splice(last.index, 1);
+            // re-index? not needed because we only ever append; placement indices remain valid for items still in array
+            // but splicing shifts later items — we never reference them again because each click pushes a fresh entry,
+            // and on next undo we always pop the most recent. To be safe, rebuild order from remaining items:
+            placementOrder.length = 0;
+            for (const [pStr, items] of Object.entries(placements)) {
+                items.forEach((_it, idx) => placementOrder.push({ page: +pStr, index: idx }));
+            }
+            undoBtn.disabled = placementOrder.length === 0;
+            setStatus(`عدد التواقيع: ${placementOrder.length}`);
+        });
+
+        // ---------- Build signed PDF ----------
+        downloadBtn.addEventListener('click', async () => {
+            if (!pdfBytes) return;
+            if (placementOrder.length === 0) {
+                setStatus('لم تضِف أي توقيع بعد.');
+                return;
+            }
+            setStatus('جاري إنشاء الملف الموقّع...');
+            try {
+                const doc = await PDFDocument.load(pdfBytes);
+                const sigBytes = dataUrlToUint8(signaturePngDataUrl!);
+                const sigImg = await doc.embedPng(sigBytes);
+                const pages = doc.getPages();
+                const padRatio = sigPad.height / sigPad.width;
+
+                for (const [pStr, items] of Object.entries(placements)) {
+                    const page = pages[+pStr];
+                    if (!page) continue;
+                    const { width: pw, height: ph } = page.getSize();
+                    for (const it of items) {
+                        const scaleX = pw / it.pageW;
+                        const scaleY = ph / it.pageH;
+                        const w = it.sizePx * scaleX;
+                        const h = it.sizePx * padRatio * scaleY;
+                        const x = it.x * scaleX - w / 2;
+                        // PDF y origin is bottom-left; overlay y is top-down
+                        const y = ph - it.y * scaleY - h / 2;
+                        page.drawImage(sigImg, { x, y, width: w, height: h });
+                    }
+                }
+
+                const out = await doc.save();
+                const blob = new Blob([out], { type: 'application/pdf' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'signed.pdf';
+                a.click();
+                URL.revokeObjectURL(url);
+                setStatus('تم الحفظ.');
+            } catch (err) {
+                console.error(err);
+                setStatus('حدث خطأ أثناء الحفظ. تحقق من وحدة التحكم.');
+            }
+        });
+
+        function dataUrlToUint8(dataUrl: string): Uint8Array {
+            const b64 = dataUrl.split(',')[1];
+            const bin = atob(b64);
+            const u8 = new Uint8Array(bin.length);
+            for (let i = 0; i < bin.length; i++) u8[i] = bin.charCodeAt(i);
+            return u8;
+        }
+
+        function setStatus(msg: string) {
+            status.textContent = msg;
+        }
+    </script>
+</Layout>
