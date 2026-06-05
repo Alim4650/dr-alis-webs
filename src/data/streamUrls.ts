@@ -42,15 +42,15 @@ export const streamUrls: Record<string, string> = {
     'x-7-mpxbq7r6': 'http://8ksat100.xyz/live/alimastor/792c5cbedf/544425.m3u8',
     'x-8-mpxbq7r6': 'http://8ksat100.xyz/live/alimastor/792c5cbedf/544424.m3u8',
 
-    // 🕌 quran-tv — المتوفّر منها في قائمة التشغيل فقط (المنشاوي + الشريم)
-    'quran-minshawi': 'http://8ksat100.xyz/live/alimastor/792c5cbedf/706560.m3u8', // M SIDIK ALMANCHAWI HD
-    'quran-musad': '', // غير موجود في قائمة التشغيل
-    'quran-lahoni': '', // غير موجود في قائمة التشغيل
-    'quran-barrak': '', // غير موجود في قائمة التشغيل
-    'quran-qatami': '', // غير موجود في قائمة التشغيل
-    'quran-hamid': '', // غير موجود في قائمة التشغيل
-    'quran-tarabulsi': '', // غير موجود في قائمة التشغيل
-    'quran-shuraim': 'http://8ksat100.xyz/live/alimastor/792c5cbedf/706559.m3u8' // SAOUD SHURAIM HD
+    // 🕌 quran-tv — قنوات غير رياضية، تُترك فارغة (المطلوب القنوات الرياضية فقط)
+    'quran-minshawi': '',
+    'quran-musad': '',
+    'quran-lahoni': '',
+    'quran-barrak': '',
+    'quran-qatami': '',
+    'quran-hamid': '',
+    'quran-tarabulsi': '',
+    'quran-shuraim': ''
 };
 
 // إرجاع رابط القناة إن وُجد
