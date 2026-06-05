@@ -1,0 +1,9 @@
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+[build.environment]
+  NODE_VERSION = "20"
+
+# محوّل Astro لـ Netlify يتكفّل بوظائف الحافة (Edge Functions)
+# وتوليد الدوال تلقائياً أثناء البناء.
