@@ -1,0 +1,58 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import VideoPlayer from '../../components/VideoPlayer.tsx';
+import { channels, channelGroups } from '../../data/channels';
+
+// توليد صفحة لكل قناة عند البناء
+export function getStaticPaths() {
+    return channels.map((c) => ({ params: { id: c.id }, props: { channel: c } }));
+}
+
+const { channel } = Astro.props;
+const groupLabel =
+    channelGroups.find((g) => g.key === channel.group)?.label ?? channel.group;
+---
+
+<Layout title={channel.name}>
+    <section class="py-6">
+        <a href="/channels" class="mb-6 inline-block text-sm text-gray-400 no-underline hover:text-primary">
+            ← العودة للقنوات
+        </a>
+
+        <div class="mb-4 flex items-center gap-3">
+            <div
+                class="flex h-12 w-12 items-center justify-center rounded-xl text-lg font-bold text-white"
+                style={`background-color: ${channel.accent}`}
+            >
+                {channel.name.replace(/[^0-9]/g, '').slice(0, 2) || '📺'}
+            </div>
+            <div>
+                <h1 class="text-2xl sm:text-3xl">{channel.name}</h1>
+                <span class="text-xs text-gray-400">{groupLabel}</span>
+            </div>
+        </div>
+
+        {
+            channel.streamUrl ? (
+                <VideoPlayer
+                    client:only="react"
+                    src={channel.streamUrl}
+                    profile={channel.streamProfile}
+                />
+            ) : (
+                <div class="flex aspect-video w-full flex-col items-center justify-center gap-3 rounded-2xl border border-white/10 bg-white/5 text-center text-sm text-gray-300">
+                    <span class="text-4xl">📡</span>
+                    <p class="font-semibold">رابط البث غير مُعدّ لهذه القناة بعد</p>
+                    <p class="max-w-xs text-xs text-gray-500">
+                        أضف رابط البث (streamUrl) لهذه القناة من ملف البيانات أو لوحة التحكم لتشغيلها.
+                    </p>
+                </div>
+            )
+        }
+
+        <div class="mt-6 flex flex-wrap items-center justify-center gap-4 text-sm text-gray-300">
+            <span>📺 {groupLabel}</span>
+            <span>⚙️ إعداد المشغّل: {channel.streamProfile}</span>
+        </div>
+    </section>
+</Layout>

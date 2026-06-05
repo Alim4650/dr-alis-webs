@@ -44,7 +44,7 @@ const title = `${match.home.name} ضد ${match.away.name}`;
         </div>
 
         <!-- مشغّل البث (جزيرة React تفاعلية) -->
-        <VideoPlayer client:only="react" src={match.streamUrl} />
+        <VideoPlayer client:only="react" src={match.streamUrl} profile="ultra-hq" />
 
         <div class="mt-6 flex flex-wrap items-center justify-center gap-4 text-sm text-gray-300">
             {match.channel && <span>📺 {match.channel}</span>}
