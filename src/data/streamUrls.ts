@@ -9,7 +9,7 @@
 
 export const streamUrls: Record<string, string> = {
     // ⚽ ALWAN SPORTS
-    'alwan-sports-1': 'https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8', // مثال تجريبي للتأكد من عمل المشغّل
+    'alwan-sports-1': '',
     'alwan-sports-2': '',
     'alwan-sports-3': '',
     'alwan-sports-4': '',
