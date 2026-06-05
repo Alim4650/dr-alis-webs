@@ -1,29 +1,47 @@
 ---
 import Layout from '../layouts/Layout.astro';
-import MatchCard from '../components/MatchCard.astro';
-import { getMatchesByStatus, statusOrder } from '../data/matches';
+import { channelGroups, getChannelsByGroup } from '../data/channels';
+import { getStreamUrl } from '../data/streamUrls';
 ---
 
-<Layout title="كورة لايف — بث المباريات">
+<Layout title="كورة لايف — بث القنوات والمباريات">
     <section class="py-8 text-center sm:py-12">
         <h1 class="mb-3">⚽ كورة لايف</h1>
-        <p class="text-lg text-gray-300">بث مباشر للمباريات بجودة عالية</p>
+        <p class="text-lg text-gray-300">بث مباشر للقنوات والمباريات بجودة عالية</p>
     </section>
 
     {
-        statusOrder.map(({ status, label }) => {
-            const list = getMatchesByStatus(status);
+        channelGroups.map((group) => {
+            const list = getChannelsByGroup(group.key);
             if (list.length === 0) return null;
             return (
                 <section class="mb-12">
                     <div class="mb-5 flex items-center gap-2">
-                        {status === 'live' && <span class="inline-block h-3 w-3 rounded-full bg-red-600 animate-pulse" />}
-                        <h2 class="text-xl sm:text-2xl">{label}</h2>
+                        <span class="text-2xl">{group.icon}</span>
+                        <h2 class="text-xl sm:text-2xl">{group.label}</h2>
                         <span class="text-sm text-gray-500">({list.length})</span>
                     </div>
-                    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                        {list.map((match) => (
-                            <MatchCard match={match} />
+                    <div class="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+                        {list.map((channel) => (
+                            <a
+                                href={`/channel/${channel.id}`}
+                                data-channel-card
+                                class="group relative flex cursor-pointer flex-col items-center gap-3 rounded-2xl border border-white/10 bg-white/5 p-4 text-center no-underline transition hover:border-white/30 hover:bg-white/10 focus:outline-none"
+                            >
+                                {getStreamUrl(channel.id) && (
+                                    <span class="absolute right-2 top-2 flex items-center gap-1 rounded-full bg-red-600 px-1.5 py-0.5 text-[9px] font-bold text-white">
+                                        <span class="inline-block h-1.5 w-1.5 rounded-full bg-white animate-pulse" />
+                                        مباشر
+                                    </span>
+                                )}
+                                <div
+                                    class="flex h-14 w-14 items-center justify-center rounded-xl text-lg font-bold text-white shadow-lg"
+                                    style={`background-color: ${channel.accent}`}
+                                >
+                                    {channel.name.replace(/[^0-9]/g, '').slice(0, 2) || '📺'}
+                                </div>
+                                <span class="text-sm font-semibold leading-tight">{channel.name}</span>
+                            </a>
                         ))}
                     </div>
                 </section>
