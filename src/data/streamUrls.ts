@@ -4,41 +4,45 @@
 //   ضع رابط البث لكل قناة بجانب معرّفها. بمجرد إضافة الرابط تعمل القناة فوراً.
 //   اترك القيمة فارغة '' للقنوات التي لا رابط لها بعد.
 //
-// ملاحظة أمان: إن كانت الروابط حساسة، يُفضّل وضعها في متغيرات بيئة
+// ملاحظة أمان: هذه الروابط تحتوي على اسم المستخدم وكلمة المرور الخاصة باشتراكك
+//   (Xtream Codes). إن كان المستودع عاماً يُفضّل وضعها في متغيرات بيئة
 //   أو ملف غير مرفوع لـ git بدل كتابتها هنا مباشرة.
+//
+// المصدر: قائمة التشغيل الشخصية (8ksat100.xyz) — صيغة الرابط:
+//   http://8ksat100.xyz/live/<user>/<pass>/<stream_id>.m3u8
 
 export const streamUrls: Record<string, string> = {
-    // ⚽ ALWAN SPORTS
-    'alwan-sports-1': '',
-    'alwan-sports-2': '',
-    'alwan-sports-3': '',
-    'alwan-sports-4': '',
-    'alwan-sports-5': '',
-    'alwan-sports-6': '',
+    // ⚽ ALWAN SPORTS  (ALWAN SPORT 1-6 HD)
+    'alwan-sports-1': 'http://8ksat100.xyz/live/alimastor/792c5cbedf/1540618.m3u8',
+    'alwan-sports-2': 'http://8ksat100.xyz/live/alimastor/792c5cbedf/1540617.m3u8',
+    'alwan-sports-3': 'http://8ksat100.xyz/live/alimastor/792c5cbedf/1540616.m3u8',
+    'alwan-sports-4': 'http://8ksat100.xyz/live/alimastor/792c5cbedf/1540615.m3u8',
+    'alwan-sports-5': 'http://8ksat100.xyz/live/alimastor/792c5cbedf/1540614.m3u8',
+    'alwan-sports-6': 'http://8ksat100.xyz/live/alimastor/792c5cbedf/1540613.m3u8',
 
-    // 🏆 Max s
-    'max-s-1': '',
-    'max-s-2': '',
-    'max-s-3': '',
-    'max-s-4': '',
+    // 🏆 Max s  (beIN SPORTS MAX 1-4)
+    'max-s-1': 'http://8ksat100.xyz/live/alimastor/792c5cbedf/1997494.m3u8',
+    'max-s-2': 'http://8ksat100.xyz/live/alimastor/792c5cbedf/1997493.m3u8',
+    'max-s-3': 'http://8ksat100.xyz/live/alimastor/792c5cbedf/1997492.m3u8',
+    'max-s-4': 'http://8ksat100.xyz/live/alimastor/792c5cbedf/1997491.m3u8',
 
     // 🇸🇦 SAUDI
-    '1-copy': '', // الثامنة 2
-    '1-copy-copy': '', // الثامنة 3
-    'ad-sport-1': '',
-    'ad-sport-2': '',
+    '1-copy': '', // الثامنة 2 — غير موجودة في قائمة التشغيل الحالية
+    '1-copy-copy': '', // الثامنة 3 — غير موجودة في قائمة التشغيل الحالية
+    'ad-sport-1': 'http://8ksat100.xyz/live/alimastor/792c5cbedf/498838.m3u8', // AD SPORTS 1 HD
+    'ad-sport-2': 'http://8ksat100.xyz/live/alimastor/792c5cbedf/498839.m3u8', // AD SPORTS 2 HD
 
-    // 📡 الكفو X
-    'x-1-mpxbq7r6': '',
-    'x-2-mpxbq7r6': '',
-    'x-3-mpxbq7r6': '',
-    'x-4-mpxbq7r6': '',
-    'x-5-mpxbq7r6': '',
-    'x-6-mpxbq7r6': '',
-    'x-7-mpxbq7r6': '',
-    'x-8-mpxbq7r6': '',
+    // 📡 الكفو X  (beIN SPORTS 1-8 HD)
+    'x-1-mpxbq7r6': 'http://8ksat100.xyz/live/alimastor/792c5cbedf/544431.m3u8',
+    'x-2-mpxbq7r6': 'http://8ksat100.xyz/live/alimastor/792c5cbedf/544430.m3u8',
+    'x-3-mpxbq7r6': 'http://8ksat100.xyz/live/alimastor/792c5cbedf/544429.m3u8',
+    'x-4-mpxbq7r6': 'http://8ksat100.xyz/live/alimastor/792c5cbedf/544428.m3u8',
+    'x-5-mpxbq7r6': 'http://8ksat100.xyz/live/alimastor/792c5cbedf/544427.m3u8',
+    'x-6-mpxbq7r6': 'http://8ksat100.xyz/live/alimastor/792c5cbedf/544426.m3u8',
+    'x-7-mpxbq7r6': 'http://8ksat100.xyz/live/alimastor/792c5cbedf/544425.m3u8',
+    'x-8-mpxbq7r6': 'http://8ksat100.xyz/live/alimastor/792c5cbedf/544424.m3u8',
 
-    // 🕌 quran-tv
+    // 🕌 quran-tv — قنوات تلاوة خاصة بمشايخ محدّدين غير متوفّرة في قائمة التشغيل
     'quran-minshawi': '',
     'quran-musad': '',
     'quran-lahoni': '',
