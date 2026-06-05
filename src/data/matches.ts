@@ -31,7 +31,7 @@ export const matches: Match[] = [
         score: { home: 2, away: 1 },
         streamUrl: 'https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8',
         commentator: 'حفيظ دراجي',
-        channel: 'بلادي سبورت 1'
+        channel: 'كورة لايف 1'
     },
     {
         id: 'liv-mci',
@@ -43,7 +43,7 @@ export const matches: Match[] = [
         score: { home: 0, away: 0 },
         streamUrl: 'https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8',
         commentator: 'رؤوف خليف',
-        channel: 'بلادي سبورت 2'
+        channel: 'كورة لايف 2'
     },
     {
         id: 'juv-mil',
@@ -52,7 +52,7 @@ export const matches: Match[] = [
         away: { name: 'ميلان', logo: '🔴' },
         status: 'upcoming',
         kickoff: '2026-06-06T18:00:00Z',
-        channel: 'بلادي سبورت 3'
+        channel: 'كورة لايف 3'
     },
     {
         id: 'bay-dor',
@@ -61,7 +61,7 @@ export const matches: Match[] = [
         away: { name: 'بوروسيا دورتموند', logo: '🟡' },
         status: 'upcoming',
         kickoff: '2026-06-06T16:30:00Z',
-        channel: 'بلادي سبورت 1'
+        channel: 'كورة لايف 1'
     },
     {
         id: 'psg-mar',
@@ -71,7 +71,7 @@ export const matches: Match[] = [
         status: 'finished',
         kickoff: '2026-06-04T20:00:00Z',
         score: { home: 3, away: 0 },
-        channel: 'بلادي سبورت 2'
+        channel: 'كورة لايف 2'
     },
     {
         id: 'ahl-zam',
@@ -81,7 +81,7 @@ export const matches: Match[] = [
         status: 'finished',
         kickoff: '2026-06-04T18:00:00Z',
         score: { home: 1, away: 1 },
-        channel: 'بلادي سبورت 3'
+        channel: 'كورة لايف 3'
     }
 ];
 
