@@ -1,0 +1,87 @@
+---
+import type { Match } from '../data/matches';
+
+interface Props {
+    match: Match;
+}
+
+const { match } = Astro.props;
+
+// تنسيق وقت المباراة بالعربية
+const kickoffDate = new Date(match.kickoff);
+const timeLabel = new Intl.DateTimeFormat('ar', {
+    hour: '2-digit',
+    minute: '2-digit',
+    day: 'numeric',
+    month: 'short'
+}).format(kickoffDate);
+
+const statusBadge = {
+    live: { text: 'مباشر', class: 'bg-red-600 animate-pulse' },
+    upcoming: { text: 'قريباً', class: 'bg-blue-600' },
+    finished: { text: 'انتهت', class: 'bg-gray-600' }
+}[match.status];
+
+const canWatch = match.status === 'live' && !!match.streamUrl;
+---
+
+<a
+    href={canWatch ? `/match/${match.id}` : '#'}
+    data-channel-card
+    class:list={[
+        'block rounded-2xl border border-white/10 bg-white/5 p-5 transition hover:border-primary/60 hover:bg-white/10 no-underline',
+        { 'opacity-70 pointer-events-none': !canWatch }
+    ]}
+>
+    <div class="flex items-center justify-between mb-4">
+        <span class="text-xs text-gray-300">{match.league}</span>
+        <span class:list={['rounded-full px-2.5 py-0.5 text-xs font-bold text-white', statusBadge.class]}>
+            {statusBadge.text}
+        </span>
+    </div>
+
+    <div class="flex items-center justify-between gap-2">
+        <!-- الفريق المستضيف -->
+        <div class="flex flex-1 flex-col items-center gap-2 text-center">
+            <span class="text-4xl">{match.home.logo}</span>
+            <span class="text-sm font-semibold">{match.home.name}</span>
+        </div>
+
+        <!-- النتيجة أو الوقت -->
+        <div class="flex flex-col items-center px-2">
+            {
+                match.score ? (
+                    <span class="text-2xl font-extrabold tracking-widest">
+                        {match.score.home} - {match.score.away}
+                    </span>
+                ) : (
+                    <span class="text-lg font-bold text-gray-400">VS</span>
+                )
+            }
+            <span class="mt-1 text-[11px] text-gray-400">{timeLabel}</span>
+        </div>
+
+        <!-- الفريق الضيف -->
+        <div class="flex flex-1 flex-col items-center gap-2 text-center">
+            <span class="text-4xl">{match.away.logo}</span>
+            <span class="text-sm font-semibold">{match.away.name}</span>
+        </div>
+    </div>
+
+    {
+        match.channel && (
+            <div class="mt-4 flex items-center justify-center gap-1.5 text-xs text-gray-400">
+                <span>📺</span>
+                <span>{match.channel}</span>
+            </div>
+        )
+    }
+
+    {
+        canWatch && (
+            <div class="mt-4 rounded-xl bg-primary py-2 text-center text-sm font-bold text-primary-content">
+                ▶ شاهد البث المباشر
+            </div>
+        )
+    }
+</a>

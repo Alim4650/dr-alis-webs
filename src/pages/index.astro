@@ -1,10 +1,33 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import MatchCard from '../components/MatchCard.astro';
+import { getMatchesByStatus, statusOrder } from '../data/matches';
 ---
 
-<Layout title="Dr-Ali's-Webs">
-    <section class="py-20 sm:py-32 text-center">
-        <h1 class="mb-6">أهلاً وسهلاً</h1>
-        <p class="text-2xl text-primary font-bold">Dr-Ali's-Webs</p>
+<Layout title="بلادي سبورت — بث المباريات">
+    <section class="py-8 text-center sm:py-12">
+        <h1 class="mb-3">بلادي سبورت</h1>
+        <p class="text-lg text-gray-300">بث مباشر للمباريات بجودة عالية</p>
     </section>
+
+    {
+        statusOrder.map(({ status, label }) => {
+            const list = getMatchesByStatus(status);
+            if (list.length === 0) return null;
+            return (
+                <section class="mb-12">
+                    <div class="mb-5 flex items-center gap-2">
+                        {status === 'live' && <span class="inline-block h-3 w-3 rounded-full bg-red-600 animate-pulse" />}
+                        <h2 class="text-xl sm:text-2xl">{label}</h2>
+                        <span class="text-sm text-gray-500">({list.length})</span>
+                    </div>
+                    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                        {list.map((match) => (
+                            <MatchCard match={match} />
+                        ))}
+                    </div>
+                </section>
+            );
+        })
+    }
 </Layout>
