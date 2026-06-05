@@ -27,8 +27,8 @@ export const streamUrls: Record<string, string> = {
     'max-s-4': 'http://8ksat100.xyz/live/alimastor/792c5cbedf/1997491.m3u8',
 
     // 🇸🇦 SAUDI
-    '1-copy': '', // الثامنة 2 — غير موجودة في قائمة التشغيل الحالية
-    '1-copy-copy': '', // الثامنة 3 — غير موجودة في قائمة التشغيل الحالية
+    '1-copy': 'http://8ksat100.xyz/live/alimastor/792c5cbedf/1752080.m3u8', // الثامنة 2 — THAMANYA 2 SPORT HD
+    '1-copy-copy': 'http://8ksat100.xyz/live/alimastor/792c5cbedf/1752079.m3u8', // الثامنة 3 — THAMANYA 3 SPORT HD
     'ad-sport-1': 'http://8ksat100.xyz/live/alimastor/792c5cbedf/498838.m3u8', // AD SPORTS 1 HD
     'ad-sport-2': 'http://8ksat100.xyz/live/alimastor/792c5cbedf/498839.m3u8', // AD SPORTS 2 HD
 
@@ -42,15 +42,15 @@ export const streamUrls: Record<string, string> = {
     'x-7-mpxbq7r6': 'http://8ksat100.xyz/live/alimastor/792c5cbedf/544425.m3u8',
     'x-8-mpxbq7r6': 'http://8ksat100.xyz/live/alimastor/792c5cbedf/544424.m3u8',
 
-    // 🕌 quran-tv — قنوات تلاوة خاصة بمشايخ محدّدين غير متوفّرة في قائمة التشغيل
-    'quran-minshawi': '',
-    'quran-musad': '',
-    'quran-lahoni': '',
-    'quran-barrak': '',
-    'quran-qatami': '',
-    'quran-hamid': '',
-    'quran-tarabulsi': '',
-    'quran-shuraim': ''
+    // 🕌 quran-tv — المتوفّر منها في قائمة التشغيل فقط (المنشاوي + الشريم)
+    'quran-minshawi': 'http://8ksat100.xyz/live/alimastor/792c5cbedf/706560.m3u8', // M SIDIK ALMANCHAWI HD
+    'quran-musad': '', // غير موجود في قائمة التشغيل
+    'quran-lahoni': '', // غير موجود في قائمة التشغيل
+    'quran-barrak': '', // غير موجود في قائمة التشغيل
+    'quran-qatami': '', // غير موجود في قائمة التشغيل
+    'quran-hamid': '', // غير موجود في قائمة التشغيل
+    'quran-tarabulsi': '', // غير موجود في قائمة التشغيل
+    'quran-shuraim': 'http://8ksat100.xyz/live/alimastor/792c5cbedf/706559.m3u8' // SAOUD SHURAIM HD
 };
 
 // إرجاع رابط القناة إن وُجد
