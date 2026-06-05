@@ -2,6 +2,7 @@
 import Layout from '../../layouts/Layout.astro';
 import VideoPlayer from '../../components/VideoPlayer.tsx';
 import { channels, channelGroups } from '../../data/channels';
+import { getStreamUrl } from '../../data/streamUrls';
 
 // توليد صفحة لكل قناة عند البناء
 export function getStaticPaths() {
@@ -11,6 +12,7 @@ export function getStaticPaths() {
 const { channel } = Astro.props;
 const groupLabel =
     channelGroups.find((g) => g.key === channel.group)?.label ?? channel.group;
+const streamUrl = getStreamUrl(channel.id);
 ---
 
 <Layout title={channel.name}>
@@ -33,10 +35,10 @@ const groupLabel =
         </div>
 
         {
-            channel.streamUrl ? (
+            streamUrl ? (
                 <VideoPlayer
                     client:only="react"
-                    src={channel.streamUrl}
+                    src={streamUrl}
                     profile={channel.streamProfile}
                 />
             ) : (

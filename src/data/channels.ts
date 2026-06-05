@@ -74,3 +74,8 @@ export function getChannelsByGroup(group: string): Channel[] {
         .filter((c) => c.group === group)
         .sort((a, b) => a.sortOrder - b.sortOrder);
 }
+
+// إيجاد قناة بالمعرّف
+export function getChannelById(id: string): Channel | undefined {
+    return channels.find((c) => c.id === id);
+}

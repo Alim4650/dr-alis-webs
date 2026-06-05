@@ -1,6 +1,7 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import { channelGroups, getChannelsByGroup } from '../data/channels';
+import { getStreamUrl } from '../data/streamUrls';
 ---
 
 <Layout title="القنوات">
@@ -25,8 +26,14 @@ import { channelGroups, getChannelsByGroup } from '../data/channels';
                             <a
                                 href={`/channel/${channel.id}`}
                                 data-channel-card
-                                class="group flex cursor-pointer flex-col items-center gap-3 rounded-2xl border border-white/10 bg-white/5 p-4 text-center no-underline transition hover:border-white/30 hover:bg-white/10 focus:outline-none"
+                                class="group relative flex cursor-pointer flex-col items-center gap-3 rounded-2xl border border-white/10 bg-white/5 p-4 text-center no-underline transition hover:border-white/30 hover:bg-white/10 focus:outline-none"
                             >
+                                {getStreamUrl(channel.id) && (
+                                    <span class="absolute right-2 top-2 flex items-center gap-1 rounded-full bg-red-600 px-1.5 py-0.5 text-[9px] font-bold text-white">
+                                        <span class="inline-block h-1.5 w-1.5 rounded-full bg-white animate-pulse" />
+                                        مباشر
+                                    </span>
+                                )}
                                 <div
                                     class="flex h-14 w-14 items-center justify-center rounded-xl text-lg font-bold text-white shadow-lg"
                                     style={`background-color: ${channel.accent}`}
